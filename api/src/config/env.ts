@@ -19,6 +19,9 @@ function requiredNumber(name: string): number {
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: requiredNumber('PORT'),
+  corsOrigin: required('CORS_ORIGIN')
+    .split(',')
+    .map((origin) => origin.trim()),
   db: {
     host: required('DB_HOST'),
     port: requiredNumber('DB_PORT'),
