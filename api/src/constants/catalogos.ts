@@ -7,7 +7,7 @@ export const TIPOS_IDENTIFICACION = [
 
 export type TipoIdentificacion = (typeof TIPOS_IDENTIFICACION)[number]['valor'];
 
-export const TIPOS_IDENTIFICACION_VALORES = TIPOS_IDENTIFICACION.map((t) => t.valor);
+export const TIPOS_IDENTIFICACION_VALORES: readonly string[] = TIPOS_IDENTIFICACION.map((t) => t.valor);
 
 export const SERVICIOS = [
   'Internet 200 MB',
@@ -19,3 +19,5 @@ export const SERVICIOS = [
 ] as const;
 
 export type ServicioNombre = (typeof SERVICIOS)[number];
+
+export const SERVICIOS_VALORES: readonly string[] = SERVICIOS;
