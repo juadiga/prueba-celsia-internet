@@ -3,6 +3,7 @@ import {
   createCliente,
   deleteCliente,
   getCliente,
+  getClienteConServicios,
   listClientes,
   updateCliente,
 } from '../controllers/clientes.controller';
@@ -13,6 +14,7 @@ import { validateUpdateClienteDto } from '../dtos/UpdateClienteDto';
 export const clientesRouter = Router();
 
 clientesRouter.get('/clientes', listClientes);
+clientesRouter.get('/clientes/:identificacion/servicios', getClienteConServicios);
 clientesRouter.get('/clientes/:identificacion', getCliente);
 clientesRouter.post('/clientes', validate(validateCreateClienteDto), createCliente);
 clientesRouter.put('/clientes/:identificacion', validate(validateUpdateClienteDto), updateCliente);

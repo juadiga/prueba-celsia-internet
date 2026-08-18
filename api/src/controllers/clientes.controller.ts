@@ -1,12 +1,16 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../middlewares/asyncHandler';
 import { toClienteResponseDto } from '../dtos/ClienteResponseDto';
+import { toServicioResponseDto } from '../dtos/ServicioResponseDto';
 import { CreateClienteDto } from '../dtos/CreateClienteDto';
 import { UpdateClienteDto } from '../dtos/UpdateClienteDto';
 import { ClienteRepository } from '../repositories/cliente.repository';
+import { ServicioRepository } from '../repositories/servicio.repository';
 import { ClienteService } from '../services/cliente.service';
 
-const clienteService = new ClienteService(new ClienteRepository());
+const clienteRepository = new ClienteRepository();
+const servicioRepository = new ServicioRepository();
+const clienteService = new ClienteService(clienteRepository);
 
 export const listClientes = asyncHandler(async (_req: Request, res: Response) => {
   const clientes = await clienteService.findAll();
@@ -47,6 +51,21 @@ export const updateCliente = asyncHandler(async (req: Request, res: Response) =>
     message: 'Cliente actualizado',
     errors: [],
     data: toClienteResponseDto(cliente),
+  });
+});
+
+export const getClienteConServicios = asyncHandler(async (req: Request, res: Response) => {
+  const identificacion = req.params.identificacion as string;
+  const cliente = await clienteService.findByIdentificacion(identificacion);
+  const servicios = await servicioRepository.findByIdentificacion(identificacion);
+  res.status(200).json({
+    success: true,
+    message: 'OK',
+    errors: [],
+    data: {
+      cliente: toClienteResponseDto(cliente),
+      servicios: servicios.map(toServicioResponseDto),
+    },
   });
 });
 
