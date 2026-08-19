@@ -19,6 +19,10 @@ export class ServicioRepository {
     return this.repository.findBy({ identificacion });
   }
 
+  countByIdentificacion(identificacion: string): Promise<number> {
+    return this.repository.countBy({ identificacion });
+  }
+
   findOne(identificacion: string, servicio: string): Promise<Servicio | null> {
     return this.repository.findOneBy({ identificacion, servicio });
   }

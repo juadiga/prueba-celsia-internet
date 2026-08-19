@@ -11,7 +11,7 @@ import { ClienteService } from '../services/cliente.service';
 
 const clienteRepository = new ClienteRepository();
 const servicioRepository = new ServicioRepository();
-const clienteService = new ClienteService(clienteRepository);
+const clienteService = new ClienteService(clienteRepository, servicioRepository);
 
 export const listClientes = asyncHandler(async (_req: Request, res: Response) => {
   const clientes = await clienteService.findAll();

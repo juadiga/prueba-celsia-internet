@@ -5,7 +5,7 @@ internet contratados. Consume la API descrita en `../api/README.md`.
 
 ## Requisitos
 
-- Node.js 20 LTS
+- Node.js 20 LTS (versión fijada en `.nvmrc`)
 - Angular CLI 17+ (`npm install -g @angular/cli`, opcional; también se puede
   usar `npx ng`)
 
@@ -13,6 +13,7 @@ internet contratados. Consume la API descrita en `../api/README.md`.
 
 ```bash
 cd webapp
+nvm use   # usa la versión de .nvmrc
 npm install
 ```
 
@@ -47,6 +48,34 @@ npm run build
 
 Genera los artefactos en `dist/webapp`, servidos por Nginx en el contenedor
 (ver `Dockerfile`).
+
+## Ejecución con Docker
+
+```bash
+docker network create celsia-net     # una sola vez, compartida con el api
+docker compose up -d --build         # http://localhost:8080
+docker compose logs -f webapp
+```
+
+- Imagen multi-stage: `node:20-alpine` para el `ng build` →
+  `nginxinc/nginx-unprivileged:alpine` sirviendo `/usr/share/nginx/html` como
+  usuario no root, escuchando en el puerto 8080.
+- El servicio declara la política de logs `json-file` (`max-size: 10m`,
+  `max-file: 3`), igual que los del `api`.
+
+
+## Pruebas
+
+Karma + Jasmine en modo headless:
+
+```bash
+npm test         # con navegador y watch
+npm run test:ci  # ChromeHeadless, sin watch (el del pipeline)
+```
+
+Specs mínimos: `ClienteService` arma correctamente la petición HTTP
+(`HttpTestingController`) y el formulario de cliente queda inválido con
+campos vacíos. Son un extra fuera del alcance del enunciado.
 
 ## Estructura
 
@@ -102,6 +131,3 @@ existe") se muestran tal cual los devuelve la API.
 - **Container/Presentational** — los componentes de `features/` actúan como
   contenedores (manejan estado, llaman servicios, navegan); `AlertComponent`
   en `shared/` es puramente presentacional y recibe todo por `@Input`.
-
-Ver `../README.md` (punto 2.4 de la prueba teórica) para la justificación
-general de patrones usados en toda la solución.

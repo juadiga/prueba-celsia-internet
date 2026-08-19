@@ -1,5 +1,6 @@
 import { ClienteService } from './cliente.service';
 import { ClienteRepository } from '../repositories/cliente.repository';
+import { ServicioRepository } from '../repositories/servicio.repository';
 import { ConflictError } from '../exceptions/ConflictError';
 import { NotFoundError } from '../exceptions/NotFoundError';
 import { Cliente } from '../entities/Cliente';
@@ -21,6 +22,7 @@ function buildCliente(overrides: Partial<Cliente> = {}): Cliente {
 
 describe('ClienteService', () => {
   let repository: jest.Mocked<ClienteRepository>;
+  let servicioRepository: jest.Mocked<ServicioRepository>;
   let service: ClienteService;
 
   beforeEach(() => {
@@ -31,7 +33,10 @@ describe('ClienteService', () => {
       update: jest.fn(),
       delete: jest.fn(),
     } as unknown as jest.Mocked<ClienteRepository>;
-    service = new ClienteService(repository);
+    servicioRepository = {
+      countByIdentificacion: jest.fn(),
+    } as unknown as jest.Mocked<ServicioRepository>;
+    service = new ClienteService(repository, servicioRepository);
   });
 
   describe('create', () => {
@@ -54,6 +59,36 @@ describe('ClienteService', () => {
         new ConflictError('El registro ya existe'),
       );
       expect(repository.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('delete', () => {
+    it('elimina el cliente cuando no tiene servicios contratados', async () => {
+      repository.findByIdentificacion.mockResolvedValue(buildCliente());
+      servicioRepository.countByIdentificacion.mockResolvedValue(0);
+
+      await service.delete('123');
+
+      expect(repository.delete).toHaveBeenCalledWith('123');
+    });
+
+    it('lanza ConflictError cuando el cliente tiene servicios contratados', async () => {
+      repository.findByIdentificacion.mockResolvedValue(buildCliente());
+      servicioRepository.countByIdentificacion.mockResolvedValue(2);
+
+      await expect(service.delete('123')).rejects.toMatchObject(
+        new ConflictError('El cliente tiene servicios contratados y no puede ser eliminado'),
+      );
+      expect(repository.delete).not.toHaveBeenCalled();
+    });
+
+    it('lanza NotFoundError cuando el cliente no existe', async () => {
+      repository.findByIdentificacion.mockResolvedValue(null);
+
+      await expect(service.delete('999')).rejects.toMatchObject(
+        new NotFoundError('El cliente no existe'),
+      );
+      expect(repository.delete).not.toHaveBeenCalled();
     });
   });
 
