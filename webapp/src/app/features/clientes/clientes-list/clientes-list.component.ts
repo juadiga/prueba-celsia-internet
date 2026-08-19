@@ -21,6 +21,10 @@ export class ClientesListComponent implements OnInit {
   constructor(private readonly clienteService: ClienteService) {}
 
   ngOnInit(): void {
+    const mensajeExito = history.state?.mensajeExito as string | undefined;
+    if (mensajeExito) {
+      this.mensajeExito = mensajeExito;
+    }
     this.cargarClientes();
   }
 

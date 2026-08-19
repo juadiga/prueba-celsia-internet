@@ -1,0 +1,90 @@
+<h1 class="h3 mb-3">Contratar servicio</h1>
+
+<app-alert type="danger" [message]="mensajeError"></app-alert>
+
+<form [formGroup]="form" (ngSubmit)="guardar()" class="card card-body" novalidate>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label" for="identificacion">Identificación del cliente</label>
+      <input
+        id="identificacion"
+        type="text"
+        class="form-control"
+        [class.is-invalid]="invalido('identificacion')"
+        formControlName="identificacion"
+      />
+      @if (invalido('identificacion')) {
+        <div class="invalid-feedback">La identificación es obligatoria (máx. 20 caracteres).</div>
+      }
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label" for="servicio">Servicio</label>
+      <select
+        id="servicio"
+        class="form-select"
+        [class.is-invalid]="invalido('servicio')"
+        formControlName="servicio"
+      >
+        <option value="" disabled>Seleccione...</option>
+        @for (servicio of serviciosDisponibles; track servicio) {
+          <option [value]="servicio">{{ servicio }}</option>
+        }
+      </select>
+      @if (invalido('servicio')) {
+        <div class="invalid-feedback">Seleccione un servicio.</div>
+      }
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label" for="ultimoPago">Último pago</label>
+      <input
+        id="ultimoPago"
+        type="number"
+        min="0"
+        step="1"
+        class="form-control"
+        [class.is-invalid]="invalido('ultimoPago')"
+        formControlName="ultimoPago"
+      />
+      @if (invalido('ultimoPago')) {
+        <div class="invalid-feedback">El último pago debe ser un entero mayor o igual a 0.</div>
+      }
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="fechaInicio">Fecha de inicio</label>
+      <input
+        id="fechaInicio"
+        type="date"
+        class="form-control"
+        [class.is-invalid]="invalido('fechaInicio')"
+        formControlName="fechaInicio"
+      />
+      @if (invalido('fechaInicio')) {
+        <div class="invalid-feedback">Ingrese una fecha de inicio válida.</div>
+      }
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="ultimaFacturacion">Última facturación</label>
+      <input
+        id="ultimaFacturacion"
+        type="date"
+        class="form-control"
+        [class.is-invalid]="invalido('ultimaFacturacion')"
+        formControlName="ultimaFacturacion"
+      />
+      @if (invalido('ultimaFacturacion')) {
+        <div class="invalid-feedback">Ingrese una fecha de facturación válida.</div>
+      }
+    </div>
+  </div>
+
+  <div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary" [disabled]="guardando">
+      {{ guardando ? 'Guardando...' : 'Contratar' }}
+    </button>
+    <a class="btn btn-outline-secondary" routerLink="/clientes">Cancelar</a>
+  </div>
+</form>

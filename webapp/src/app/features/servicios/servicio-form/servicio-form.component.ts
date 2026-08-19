@@ -4,52 +4,45 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AlertComponent } from '../../../shared/alert/alert.component';
-import { pastDateValidator } from '../../../shared/validators/past-date.validator';
-import { TipoIdentificacion } from '../../../core/models/catalogo.model';
+import { nonNegativeIntegerValidator } from '../../../shared/validators/non-negative-integer.validator';
 import { CatalogoService } from '../../../core/services/catalogo.service';
 import { ClienteService } from '../../../core/services/cliente.service';
+import { ServicioService } from '../../../core/services/servicio.service';
 
 @Component({
-  selector: 'app-cliente-form',
+  selector: 'app-servicio-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, AlertComponent],
-  templateUrl: './cliente-form.component.html',
+  templateUrl: './servicio-form.component.html',
 })
-export class ClienteFormComponent implements OnInit {
-  tiposIdentificacion: TipoIdentificacion[] = [];
-  modoEdicion = false;
+export class ServicioFormComponent implements OnInit {
+  serviciosDisponibles: string[] = [];
   guardando = false;
   mensajeError: string | null = null;
 
   form = this.fb.nonNullable.group({
     identificacion: ['', [Validators.required, Validators.maxLength(20)]],
-    nombres: ['', [Validators.required, Validators.maxLength(80)]],
-    apellidos: ['', [Validators.required, Validators.maxLength(80)]],
-    tipoIdentificacion: ['', [Validators.required]],
-    fechaNacimiento: ['', [Validators.required, pastDateValidator()]],
-    numeroCelular: ['', [Validators.required, Validators.maxLength(20)]],
-    correoElectronico: ['', [Validators.required, Validators.maxLength(80), Validators.email]],
+    servicio: ['', [Validators.required]],
+    fechaInicio: ['', [Validators.required]],
+    ultimaFacturacion: ['', [Validators.required]],
+    ultimoPago: [0, [Validators.required, Validators.min(0), nonNegativeIntegerValidator()]],
   });
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly catalogoService: CatalogoService,
     private readonly clienteService: ClienteService,
+    private readonly servicioService: ServicioService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
   ) {}
 
   ngOnInit(): void {
-    this.catalogoService.getTiposIdentificacion().subscribe((tipos) => (this.tiposIdentificacion = tipos));
+    this.catalogoService.getServicios().subscribe((servicios) => (this.serviciosDisponibles = servicios));
 
-    const identificacion = this.route.snapshot.paramMap.get('identificacion');
+    const identificacion = this.route.snapshot.queryParamMap.get('identificacion');
     if (identificacion) {
-      this.modoEdicion = true;
-      this.form.controls.identificacion.disable();
-      this.clienteService.getByIdentificacion(identificacion).subscribe({
-        next: (cliente) => this.form.patchValue(cliente),
-        error: (err: Error) => (this.mensajeError = err.message),
-      });
+      this.form.controls.identificacion.setValue(identificacion);
     }
   }
 
@@ -68,14 +61,21 @@ export class ClienteFormComponent implements OnInit {
     this.mensajeError = null;
     const valor = this.form.getRawValue();
 
-    const peticion = this.modoEdicion
-      ? this.clienteService.update(valor.identificacion, valor)
-      : this.clienteService.create(valor);
+    this.clienteService.getByIdentificacion(valor.identificacion).subscribe({
+      next: () => this.contratarServicio(valor),
+      error: (err: Error) => {
+        this.mensajeError = err.message;
+        this.guardando = false;
+      },
+    });
+  }
 
-    peticion.subscribe({
+  private contratarServicio(valor: ReturnType<typeof this.form.getRawValue>): void {
+    this.servicioService.create(valor).subscribe({
       next: () =>
-        this.router.navigate(['/clientes'], {
-          state: { mensajeExito: this.modoEdicion ? 'Cliente actualizado' : 'Cliente creado' },
+        this.router.navigate(['/consulta'], {
+          queryParams: { identificacion: valor.identificacion },
+          state: { mensajeExito: 'Servicio contratado' },
         }),
       error: (err: Error) => {
         this.mensajeError = err.message;

@@ -33,15 +33,23 @@
             <td>{{ cliente.tipoIdentificacion }}</td>
             <td>{{ cliente.numeroCelular }}</td>
             <td>{{ cliente.correoElectronico }}</td>
-            <td class="text-end">
-              <a
-                class="btn btn-sm btn-outline-secondary me-2"
-                [routerLink]="['/clientes', cliente.identificacion, 'editar']"
-                >Editar</a
-              >
-              <button type="button" class="btn btn-sm btn-outline-danger" (click)="eliminar(cliente)">
-                Eliminar
-              </button>
+            <td>
+              <div class="d-flex flex-wrap gap-2 justify-content-end">
+                <a
+                  class="btn btn-sm btn-outline-primary"
+                  [routerLink]="['/consulta']"
+                  [queryParams]="{ identificacion: cliente.identificacion }"
+                  >Consultar</a
+                >
+                <a
+                  class="btn btn-sm btn-outline-secondary"
+                  [routerLink]="['/clientes', cliente.identificacion, 'editar']"
+                  >Editar</a
+                >
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="eliminar(cliente)">
+                  Eliminar
+                </button>
+              </div>
             </td>
           </tr>
         }
