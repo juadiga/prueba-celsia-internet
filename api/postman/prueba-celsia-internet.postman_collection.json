@@ -1,0 +1,274 @@
+{
+  "info": {
+    "_postman_id": "b1f4a9c2-7d31-4a5e-9c88-celsia0000001",
+    "name": "Prueba Celsia Internet - API",
+    "description": "Colección de la API de clientes y servicios contratados.\n\nVariables:\n- `baseUrl` (default http://localhost:3000/api)\n- `identificacion` (default 1020304050)\n- `servicio` (default Internet 200 MB)\n\nImportar junto con `prueba-celsia-internet.postman_environment.json` o usar las variables de la colección tal cual.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api", "type": "string" },
+    { "key": "identificacion", "value": "1020304050", "type": "string" },
+    { "key": "servicio", "value": "Internet 200 MB", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] },
+            "description": "200 si la API y MySQL responden; 503 si la base de datos no contesta."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Catálogos",
+      "item": [
+        {
+          "name": "GET /catalogos/tipos-identificacion",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/catalogos/tipos-identificacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["catalogos", "tipos-identificacion"]
+            },
+            "description": "Valores permitidos: CC, TI, CE, RC."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /catalogos/servicios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/catalogos/servicios",
+              "host": ["{{baseUrl}}"],
+              "path": ["catalogos", "servicios"]
+            },
+            "description": "Valores permitidos: Internet 200 MB, Internet 400 MB, Internet 600 MB, Directv Go, Paramount+, Win+."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "GET /clientes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/clientes", "host": ["{{baseUrl}}"], "path": ["clientes"] }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /clientes/:identificacion",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clientes/{{identificacion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["clientes", "{{identificacion}}"]
+            },
+            "description": "404 con \"El cliente no existe\" si la identificación no está registrada."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /clientes/:identificacion/servicios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clientes/{{identificacion}}/servicios",
+              "host": ["{{baseUrl}}"],
+              "path": ["clientes", "{{identificacion}}", "servicios"]
+            },
+            "description": "Punto 1.4 del enunciado: datos del cliente más sus servicios contratados."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /clientes",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificacion\": \"{{identificacion}}\",\n  \"nombres\": \"Juan Diego\",\n  \"apellidos\": \"Gómez Ramírez\",\n  \"tipoIdentificacion\": \"CC\",\n  \"fechaNacimiento\": \"1993-05-17\",\n  \"numeroCelular\": \"3001234567\",\n  \"correoElectronico\": \"juan.gomez@example.com\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/clientes", "host": ["{{baseUrl}}"], "path": ["clientes"] },
+            "description": "201 al crear. Repetir la misma identificación devuelve 409 con \"El registro ya existe\"."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /clientes (duplicado → 409)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificacion\": \"{{identificacion}}\",\n  \"nombres\": \"Juan Diego\",\n  \"apellidos\": \"Gómez Ramírez\",\n  \"tipoIdentificacion\": \"CC\",\n  \"fechaNacimiento\": \"1993-05-17\",\n  \"numeroCelular\": \"3001234567\",\n  \"correoElectronico\": \"juan.gomez@example.com\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/clientes", "host": ["{{baseUrl}}"], "path": ["clientes"] },
+            "description": "Ejecutar después de POST /clientes. Respuesta esperada: 409 {\"success\": false, \"message\": \"El registro ya existe\", \"errors\": []}."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /clientes (inválido → 400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificacion\": \"\",\n  \"nombres\": \"\",\n  \"apellidos\": \"\",\n  \"tipoIdentificacion\": \"XX\",\n  \"fechaNacimiento\": \"2999-01-01\",\n  \"numeroCelular\": \"\",\n  \"correoElectronico\": \"no-es-un-correo\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/clientes", "host": ["{{baseUrl}}"], "path": ["clientes"] },
+            "description": "400 con el detalle de cada campo en `errors`."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /clientes/:identificacion",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Juan Diego\",\n  \"apellidos\": \"Gómez Restrepo\",\n  \"tipoIdentificacion\": \"CC\",\n  \"fechaNacimiento\": \"1993-05-17\",\n  \"numeroCelular\": \"3009876543\",\n  \"correoElectronico\": \"juan.restrepo@example.com\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clientes/{{identificacion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["clientes", "{{identificacion}}"]
+            },
+            "description": "La identificación no se actualiza: viaja en la URL, no en el cuerpo."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /clientes/:identificacion",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clientes/{{identificacion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["clientes", "{{identificacion}}"]
+            },
+            "description": "Ejecutar al final: el cliente no puede tener servicios asociados (FK ON DELETE NO ACTION)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Servicios",
+      "item": [
+        {
+          "name": "GET /servicios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/servicios", "host": ["{{baseUrl}}"], "path": ["servicios"] }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /servicios",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificacion\": \"{{identificacion}}\",\n  \"servicio\": \"{{servicio}}\",\n  \"fechaInicio\": \"2025-01-15\",\n  \"ultimaFacturacion\": \"2026-08-01\",\n  \"ultimoPago\": 89900\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/servicios", "host": ["{{baseUrl}}"], "path": ["servicios"] },
+            "description": "Punto 1.3: requiere que el cliente exista. Crear primero el cliente."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /servicios (duplicado → 409)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificacion\": \"{{identificacion}}\",\n  \"servicio\": \"{{servicio}}\",\n  \"fechaInicio\": \"2025-01-15\",\n  \"ultimaFacturacion\": \"2026-08-01\",\n  \"ultimoPago\": 89900\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/servicios", "host": ["{{baseUrl}}"], "path": ["servicios"] },
+            "description": "La pareja identificacion + servicio es la llave primaria: 409 \"El registro ya existe\"."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /servicios (cliente inexistente → 404)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identificacion\": \"0000000000\",\n  \"servicio\": \"Win+\",\n  \"fechaInicio\": \"2025-01-15\",\n  \"ultimaFacturacion\": \"2026-08-01\",\n  \"ultimoPago\": 0\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/servicios", "host": ["{{baseUrl}}"], "path": ["servicios"] },
+            "description": "Integridad referencial: 404 con \"El cliente no existe\"."
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /servicios/:identificacion/:servicio",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaInicio\": \"2025-01-15\",\n  \"ultimaFacturacion\": \"2026-09-01\",\n  \"ultimoPago\": 99900\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{identificacion}}/{{servicio}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["servicios", "{{identificacion}}", "{{servicio}}"]
+            },
+            "description": "La llave compuesta viaja en la URL; el cuerpo solo lleva los campos actualizables."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /servicios/:identificacion/:servicio",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/servicios/{{identificacion}}/{{servicio}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["servicios", "{{identificacion}}", "{{servicio}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
