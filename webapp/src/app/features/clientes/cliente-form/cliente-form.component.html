@@ -1,0 +1,114 @@
+<h1 class="h3 mb-3">{{ modoEdicion ? 'Editar cliente' : 'Nuevo cliente' }}</h1>
+
+<app-alert type="danger" [message]="mensajeError"></app-alert>
+
+<form [formGroup]="form" (ngSubmit)="guardar()" class="card card-body" novalidate>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label" for="identificacion">Identificación</label>
+      <input
+        id="identificacion"
+        type="text"
+        class="form-control"
+        [class.is-invalid]="invalido('identificacion')"
+        formControlName="identificacion"
+      />
+      @if (invalido('identificacion')) {
+        <div class="invalid-feedback">La identificación es obligatoria (máx. 20 caracteres).</div>
+      }
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label" for="tipoIdentificacion">Tipo de identificación</label>
+      <select
+        id="tipoIdentificacion"
+        class="form-select"
+        [class.is-invalid]="invalido('tipoIdentificacion')"
+        formControlName="tipoIdentificacion"
+      >
+        <option value="" disabled>Seleccione...</option>
+        @for (tipo of tiposIdentificacion; track tipo.valor) {
+          <option [value]="tipo.valor">{{ tipo.descripcion }}</option>
+        }
+      </select>
+      @if (invalido('tipoIdentificacion')) {
+        <div class="invalid-feedback">Seleccione un tipo de identificación.</div>
+      }
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label" for="fechaNacimiento">Fecha de nacimiento</label>
+      <input
+        id="fechaNacimiento"
+        type="date"
+        class="form-control"
+        [class.is-invalid]="invalido('fechaNacimiento')"
+        formControlName="fechaNacimiento"
+      />
+      @if (invalido('fechaNacimiento')) {
+        <div class="invalid-feedback">Ingrese una fecha válida en el pasado.</div>
+      }
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="nombres">Nombres</label>
+      <input
+        id="nombres"
+        type="text"
+        class="form-control"
+        [class.is-invalid]="invalido('nombres')"
+        formControlName="nombres"
+      />
+      @if (invalido('nombres')) {
+        <div class="invalid-feedback">Los nombres son obligatorios (máx. 80 caracteres).</div>
+      }
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="apellidos">Apellidos</label>
+      <input
+        id="apellidos"
+        type="text"
+        class="form-control"
+        [class.is-invalid]="invalido('apellidos')"
+        formControlName="apellidos"
+      />
+      @if (invalido('apellidos')) {
+        <div class="invalid-feedback">Los apellidos son obligatorios (máx. 80 caracteres).</div>
+      }
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="numeroCelular">Número celular</label>
+      <input
+        id="numeroCelular"
+        type="text"
+        class="form-control"
+        [class.is-invalid]="invalido('numeroCelular')"
+        formControlName="numeroCelular"
+      />
+      @if (invalido('numeroCelular')) {
+        <div class="invalid-feedback">El número celular es obligatorio (máx. 20 caracteres).</div>
+      }
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="correoElectronico">Correo electrónico</label>
+      <input
+        id="correoElectronico"
+        type="email"
+        class="form-control"
+        [class.is-invalid]="invalido('correoElectronico')"
+        formControlName="correoElectronico"
+      />
+      @if (invalido('correoElectronico')) {
+        <div class="invalid-feedback">Ingrese un correo válido (máx. 80 caracteres).</div>
+      }
+    </div>
+  </div>
+
+  <div class="mt-4 d-flex gap-2">
+    <button type="submit" class="btn btn-primary" [disabled]="guardando">Guardar</button>
+    <a class="btn btn-outline-secondary" routerLink="/clientes">Cancelar</a>
+  </div>
+</form>
