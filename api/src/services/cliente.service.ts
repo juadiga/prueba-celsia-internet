@@ -1,4 +1,5 @@
 import { Cliente } from '../entities/Cliente';
+import { Servicio } from '../entities/Servicio';
 import { ConflictError } from '../exceptions/ConflictError';
 import { NotFoundError } from '../exceptions/NotFoundError';
 import { ClienteRepository } from '../repositories/cliente.repository';
@@ -22,6 +23,14 @@ export class ClienteService {
       throw new NotFoundError('El cliente no existe');
     }
     return cliente;
+  }
+
+  async findConServicios(
+    identificacion: string,
+  ): Promise<{ cliente: Cliente; servicios: Servicio[] }> {
+    const cliente = await this.findByIdentificacion(identificacion);
+    const servicios = await this.servicioRepository.findByIdentificacion(identificacion);
+    return { cliente, servicios };
   }
 
   async create(dto: CreateClienteDto): Promise<Cliente> {

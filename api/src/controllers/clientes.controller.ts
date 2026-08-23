@@ -36,9 +36,9 @@ export const updateCliente = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const getClienteConServicios = asyncHandler(async (req: Request, res: Response) => {
-  const identificacion = req.params.identificacion as string;
-  const cliente = await clienteService.findByIdentificacion(identificacion);
-  const servicios = await servicioRepository.findByIdentificacion(identificacion);
+  const { cliente, servicios } = await clienteService.findConServicios(
+    req.params.identificacion as string,
+  );
   res.status(200).json(
     successResponse({
       cliente: toClienteResponseDto(cliente),
