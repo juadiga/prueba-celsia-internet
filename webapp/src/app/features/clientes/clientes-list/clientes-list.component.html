@@ -1,0 +1,59 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Clientes</h1>
+  <a class="btn btn-primary" routerLink="/clientes/nuevo">Nuevo cliente</a>
+</div>
+
+<app-alert type="success" [message]="mensajeExito"></app-alert>
+<app-alert type="danger" [message]="mensajeError"></app-alert>
+
+@if (cargando) {
+  <p>Cargando clientes...</p>
+} @else if (clientes.length === 0) {
+  <p class="text-muted">No hay clientes registrados.</p>
+} @else {
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Identificación</th>
+          <th>Nombres</th>
+          <th>Apellidos</th>
+          <th>Tipo Id.</th>
+          <th>Celular</th>
+          <th>Correo</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (cliente of clientes; track cliente.identificacion) {
+          <tr>
+            <td>{{ cliente.identificacion }}</td>
+            <td>{{ cliente.nombres }}</td>
+            <td>{{ cliente.apellidos }}</td>
+            <td>{{ cliente.tipoIdentificacion }}</td>
+            <td>{{ cliente.numeroCelular }}</td>
+            <td>{{ cliente.correoElectronico }}</td>
+            <td>
+              <div class="d-flex flex-wrap gap-2 justify-content-end">
+                <a
+                  class="btn btn-sm btn-outline-primary"
+                  [routerLink]="['/consulta']"
+                  [queryParams]="{ identificacion: cliente.identificacion }"
+                  >Consultar</a
+                >
+                <a
+                  class="btn btn-sm btn-outline-secondary"
+                  [routerLink]="['/clientes', cliente.identificacion, 'editar']"
+                  >Editar</a
+                >
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="eliminar(cliente)">
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

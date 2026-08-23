@@ -1,0 +1,77 @@
+<h1 class="h3 mb-3">Consulta por identificación</h1>
+
+<app-alert type="success" [message]="mensajeExito"></app-alert>
+<app-alert type="danger" [message]="mensajeError"></app-alert>
+
+<form class="card card-body mb-3" (ngSubmit)="buscar()">
+  <label class="form-label" for="identificacion">Número de identificación</label>
+  <div class="d-flex flex-wrap gap-2">
+    <input
+      id="identificacion"
+      type="text"
+      class="form-control"
+      style="min-width: 200px; flex: 1 1 auto"
+      name="identificacion"
+      [(ngModel)]="identificacion"
+    />
+    <button type="submit" class="btn btn-primary" [disabled]="buscando">
+      {{ buscando ? 'Buscando...' : 'Buscar' }}
+    </button>
+  </div>
+</form>
+
+@if (buscando) {
+  <p>Buscando...</p>
+} @else if (cliente) {
+  <div class="card card-body mb-3">
+    <h2 class="h5">Datos del cliente</h2>
+    <dl class="row mb-0">
+      <dt class="col-sm-3">Identificación</dt>
+      <dd class="col-sm-9">{{ cliente.identificacion }}</dd>
+      <dt class="col-sm-3">Nombres</dt>
+      <dd class="col-sm-9">{{ cliente.nombres }} {{ cliente.apellidos }}</dd>
+      <dt class="col-sm-3">Tipo Id.</dt>
+      <dd class="col-sm-9">{{ cliente.tipoIdentificacion }}</dd>
+      <dt class="col-sm-3">Celular</dt>
+      <dd class="col-sm-9">{{ cliente.numeroCelular }}</dd>
+      <dt class="col-sm-3">Correo</dt>
+      <dd class="col-sm-9">{{ cliente.correoElectronico }}</dd>
+    </dl>
+  </div>
+
+  <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-2">
+    <h2 class="h5 mb-0">Servicios contratados</h2>
+    <a class="btn btn-sm btn-primary" [routerLink]="['/servicios/nuevo']" [queryParams]="{ identificacion: cliente.identificacion }">
+      Contratar servicio
+    </a>
+  </div>
+
+  @if (servicios.length === 0) {
+    <p class="text-muted">Este cliente no tiene servicios contratados.</p>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <thead>
+          <tr>
+            <th>Servicio</th>
+            <th>Fecha inicio</th>
+            <th>Última facturación</th>
+            <th>Último pago</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (servicio of servicios; track servicio.servicio) {
+            <tr>
+              <td>{{ servicio.servicio }}</td>
+              <td>{{ servicio.fechaInicio }}</td>
+              <td>{{ servicio.ultimaFacturacion }}</td>
+              <td>{{ servicio.ultimoPago }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+} @else if (buscado && !mensajeError) {
+  <p class="text-muted">Sin resultados para la identificación consultada.</p>
+}
